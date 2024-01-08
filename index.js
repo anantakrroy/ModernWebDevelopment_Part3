@@ -70,14 +70,23 @@ app.delete("/api/persons/:id", (request, response) => {
 
 app.post("/api/persons", (request, response) => {
   const body = request.body;
+  //   error handling - name or number not present in request body
   if (
     Object.keys(body).indexOf("name") === -1 ||
     Object.keys(body).indexOf("number") === -1
   ) {
-    response
-      .status(400)
-      .json({ message: "Malformed request sent to server !" });
-  } else {
+    response.status(400).json({ errpr: "Malformed request sent to server !" });
+  }
+  //   Name not unique
+  else if (
+    phonebook.find(
+      (person) => person.name.toLowerCase() === body.name.toLowerCase()
+    )
+  ) {
+    response.status(409).json({ error: "Name must be unique!" });
+  }
+  //   Create new person
+  else {
     const id = Math.round(Math.random() * 100000);
     const newPerson = {
       id: id,
