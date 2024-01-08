@@ -2,7 +2,7 @@ const express = require("express");
 
 const app = express();
 
-// app.use(express.json());
+app.use(express.json());
 
 const phonebook = [
   {
@@ -65,6 +65,27 @@ app.delete("/api/persons/:id", (request, response) => {
     response.status(404).json({ message: `No person with id: ${id} found !` });
   } else {
     response.status(200).json(phonebook);
+  }
+});
+
+app.post("/api/persons", (request, response) => {
+  const body = request.body;
+  if (
+    Object.keys(body).indexOf("name") === -1 ||
+    Object.keys(body).indexOf("number") === -1
+  ) {
+    response
+      .status(400)
+      .json({ message: "Malformed request sent to server !" });
+  } else {
+    const id = Math.round(Math.random() * 100000);
+    const newPerson = {
+      id: id,
+      name: body.name,
+      number: body.number,
+    };
+    phonebook.push(newPerson);
+    response.status(201).json(phonebook);
   }
 });
 
