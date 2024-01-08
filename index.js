@@ -57,6 +57,17 @@ app.get("/api/persons/:id", (request, response) => {
   }
 });
 
+app.delete("/api/persons/:id", (request, response) => {
+  const id = Number(request.params.id);
+  const isAvl = phonebook.find((person) => person.id === id);
+  phonebook = phonebook.filter((person) => person.id !== id);
+  if (!isAvl) {
+    response.status(404).json({ message: `No person with id: ${id} found !` });
+  } else {
+    response.status(200).json(phonebook);
+  }
+});
+
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port : ${PORT} ...`);
