@@ -32,14 +32,30 @@ app.get("/api/persons", (request, response) => {
 });
 
 app.get("/info", (request, response) => {
-    const date = new Date();
-    response.set({
-        'Content-Type' : 'text/html',
-        'Date' : date.toString()
-    })
-    // console.log(Object.values(response))
-    response.send(`<p>Phonebook has info for <strong>${phonebook.length} people</strong></p><p>${response.get('Date')}<p/>`)
-})
+  const date = new Date();
+  response.set({
+    "Content-Type": "text/html",
+    Date: date.toString(),
+  });
+  // console.log(Object.values(response))
+  response.send(
+    `<p>Phonebook has info for <strong>${
+      phonebook.length
+    } people</strong></p><p>${response.get("Date")}<p/>`
+  );
+});
+
+app.get("/api/persons/:id", (request, response) => {
+  const id = Number(request.params.id);
+  const person = phonebook.filter((person) => person.id === id);
+  if (person.length === 0) {
+    response.status(404).json({
+      message: `No person with id : ${id} found !`,
+    });
+  } else {
+    response.status(200).json(person);
+  }
+});
 
 const PORT = 3001;
 app.listen(PORT, () => {
