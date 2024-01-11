@@ -4,7 +4,17 @@ const morgan = require("morgan");
 const app = express();
 
 app.use(express.json());
+
+// Log all requests to console in 'tiny' format
 app.use(morgan("tiny"));
+
+// Log POST requests to console in custom format
+morgan.token("request-body", function (req, res) {
+  return JSON.stringify(req.body);
+});
+
+app.use(morgan(":method :url :status :res[content-length] - :response-time ms :request-body"));
+
 
 const phonebook = [
   {
