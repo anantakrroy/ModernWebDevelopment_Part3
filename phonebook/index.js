@@ -1,9 +1,14 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
+
+// serve static files
+app.use(express.static('dist'))
 
 // Log all requests to console in 'tiny' format
 app.use(morgan("tiny"));
@@ -16,7 +21,7 @@ morgan.token("request-body", function (req, res) {
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms :request-body"));
 
 
-const phonebook = [
+let phonebook = [
   {
     id: 1,
     name: "Arto Hellas",
@@ -110,7 +115,7 @@ app.post("/api/persons", (request, response) => {
   }
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port : ${PORT} ...`);
 });
