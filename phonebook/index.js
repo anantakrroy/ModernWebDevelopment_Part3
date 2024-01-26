@@ -1,6 +1,8 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+require("dotenv").config();
+const Phonebook = require("./models/phonebook");
 
 const app = express();
 
@@ -8,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // serve static files
-app.use(express.static('dist'))
+app.use(express.static("dist"));
 
 // Log all requests to console in 'tiny' format
 app.use(morgan("tiny"));
@@ -18,48 +20,32 @@ morgan.token("request-body", function (req, res) {
   return JSON.stringify(req.body);
 });
 
-app.use(morgan(":method :url :status :res[content-length] - :response-time ms :request-body"));
-
-
-let phonebook = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
+app.use(
+  morgan(
+    ":method :url :status :res[content-length] - :response-time ms :request-body"
+  )
+);
 
 app.get("/api/persons", (request, response) => {
-  response.status(200).json(phonebook);
+  Phonebook.find({}).then((entries) => {
+    response.json(entries);
+  });
 });
 
-app.get("/info", (request, response) => {
+app.get("/api/info", (request, response) => {
   const date = new Date();
   response.set({
     "Content-Type": "text/html",
     Date: date.toString(),
   });
-  // console.log(Object.values(response))
-  response.send(
-    `<p>Phonebook has info for <strong>${
-      phonebook.length
-    } people</strong></p><p>${response.get("Date")}<p/>`
-  );
+  Phonebook.find({}).then((result) => {
+    console.log(result);
+    response.send(
+      `<p>Phonebook has info for <strong>${result.length} people</strong></p><p>${response.get(
+        "Date"
+      )}<p/>`
+    );
+  });
 });
 
 app.get("/api/persons/:id", (request, response) => {
