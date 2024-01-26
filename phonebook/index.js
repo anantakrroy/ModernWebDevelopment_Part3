@@ -41,9 +41,9 @@ app.get("/api/info", (request, response) => {
   Phonebook.find({}).then((result) => {
     console.log(result);
     response.send(
-      `<p>Phonebook has info for <strong>${result.length} people</strong></p><p>${response.get(
-        "Date"
-      )}<p/>`
+      `<p>Phonebook has info for <strong>${
+        result.length
+      } people</strong></p><p>${response.get("Date")}<p/>`
     );
   });
 });
@@ -73,32 +73,11 @@ app.delete("/api/persons/:id", (request, response) => {
 
 app.post("/api/persons", (request, response) => {
   const body = request.body;
-  //   error handling - name or number not present in request body
-  if (
-    Object.keys(body).indexOf("name") === -1 ||
-    Object.keys(body).indexOf("number") === -1
-  ) {
-    response.status(400).json({ errpr: "Malformed request sent to server !" });
-  }
-  //   Name not unique
-  else if (
-    phonebook.find(
-      (person) => person.name.toLowerCase() === body.name.toLowerCase()
-    )
-  ) {
-    response.status(409).json({ error: "Name must be unique!" });
-  }
-  //   Create new person
-  else {
-    const id = Math.round(Math.random() * 100000);
-    const newPerson = {
-      id: id,
-      name: body.name,
-      number: body.number,
-    };
-    phonebook.push(newPerson);
-    response.status(201).json(phonebook);
-  }
+  const newPerson = new Phonebook({
+    name: body.name,
+    number: body.number,
+  });
+  newPerson.save().then(savedPerson => response.json(savedPerson));
 });
 
 const PORT = process.env.PORT || 3001;
