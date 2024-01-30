@@ -3,6 +3,10 @@ const mongoose = require("mongoose");
 
 const url = process.env.MONGO_URI
 
+
+console.log(url)
+console.log(typeof url)
+
 mongoose.set('strictQuery', false)
 
 mongoose.connect(url)
