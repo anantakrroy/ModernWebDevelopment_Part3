@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "build:ui": "@powershell Remove-Item -Recurse -Force dist && cd ../../fullstackopen_univ_helsinki/part2/phonebook && npm run build && @powershell Copy-Item dist -Recurse ../../../fullstackopen_univ_helsinki_Part3/phonebook",
-    "deploy:full": "npm run build:ui && git add . && git commit -m 'phonebook deploy on Render' && git push origin master",
+    "deploy:full": "npm run build:ui && git add . && git commit -m \"phonebook deploy on Render\" && git push origin master",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
