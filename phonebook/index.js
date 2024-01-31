@@ -28,11 +28,9 @@ app.use(
 
 // Error handler
 const errorHandler = (error, request, response, next) => {
-  // console.log(error);
   if(error.name === "CastError") {
     response.status(400).json({"message" : error.message})
   }
-  // response.status(500).json({ error: error });
   next();
 };
 
