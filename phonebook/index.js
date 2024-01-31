@@ -26,12 +26,24 @@ app.use(
   )
 );
 
+// Error handler
+const errorHandler = (error, request, response, next) => {
+  // console.log(error);
+  if(error.name === "CastError") {
+    response.status(400).json({"message" : error.message})
+  }
+  // response.status(500).json({ error: error });
+  next();
+};
+
+// GET all entries
 app.get("/api/persons", (request, response) => {
   Phonebook.find({}).then((entries) => {
     response.json(entries);
   });
 });
 
+// App info
 app.get("/api/info", (request, response) => {
   const date = new Date();
   response.set({
@@ -48,6 +60,7 @@ app.get("/api/info", (request, response) => {
   });
 });
 
+// GET specific entry
 app.get("/api/persons/:id", (request, response) => {
   const id = Number(request.params.id);
   const person = phonebook.filter((person) => person.id === id);
@@ -60,25 +73,42 @@ app.get("/api/persons/:id", (request, response) => {
   }
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const isAvl = phonebook.find((person) => person.id === id);
-  phonebook = phonebook.filter((person) => person.id !== id);
-  if (!isAvl) {
-    response.status(404).json({ message: `No person with id: ${id} found !` });
-  } else {
-    response.status(200).json(phonebook);
-  }
+// DELETE specific entry
+app.delete("/api/persons/:id", (request, response, next) => {
+  const id = request.params.id;
+  Phonebook.findByIdAndDelete(id)
+    .then((deletedEntry) => {
+      // console.log(`Deleted phoneboon entry : ${deletedEntry}`);
+      if (deletedEntry) {
+        response
+          .status(204)
+          .end();
+      } else {
+        response
+          .status(404)
+          .json({
+            message: `Error deleting user id : ${id} ! Does not exist !`,
+          });
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      next(error);
+    });
 });
 
+// ADD an entry
 app.post("/api/persons", (request, response) => {
   const body = request.body;
   const newPerson = new Phonebook({
     name: body.name,
     number: body.number,
   });
-  newPerson.save().then(savedPerson => response.json(savedPerson));
+  newPerson.save().then((savedPerson) => response.json(savedPerson));
 });
+
+// use error handling middleware
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
