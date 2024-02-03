@@ -41,7 +41,7 @@ app.get("/api/persons", (request, response) => {
   });
 });
 
-// App info
+// App info to get phonebook entries count
 app.get("/api/info", (request, response) => {
   const date = new Date();
   response.set({
@@ -58,7 +58,7 @@ app.get("/api/info", (request, response) => {
   });
 });
 
-// GET specific entry
+// GET specific person from phonebook
 app.get("/api/persons/:id", (request, response, next) => {
   const id = request.params.id;
   Phonebook.findById(id)
