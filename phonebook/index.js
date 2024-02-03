@@ -28,8 +28,8 @@ app.use(
 
 // Error handler
 const errorHandler = (error, request, response, next) => {
-  if(error.name === "CastError") {
-    response.status(400).json({"message" : error.message})
+  if (error.name === "CastError") {
+    response.status(400).json({ message: error.message });
   }
   next();
 };
@@ -59,16 +59,14 @@ app.get("/api/info", (request, response) => {
 });
 
 // GET specific entry
-app.get("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const person = phonebook.filter((person) => person.id === id);
-  if (person.length === 0) {
-    response.status(404).json({
-      message: `No person with id : ${id} found !`,
+app.get("/api/persons/:id", (request, response, next) => {
+  const id = request.params.id;
+  Phonebook.findById(id)
+    .then(doc => response.status(200).json(doc))
+    .catch((error) => {
+      console.log(error);
+      next(error);
     });
-  } else {
-    response.status(200).json(person);
-  }
 });
 
 // DELETE specific entry
@@ -78,15 +76,11 @@ app.delete("/api/persons/:id", (request, response, next) => {
     .then((deletedEntry) => {
       // console.log(`Deleted phoneboon entry : ${deletedEntry}`);
       if (deletedEntry) {
-        response
-          .status(204)
-          .end();
+        response.status(204).end();
       } else {
-        response
-          .status(404)
-          .json({
-            message: `Error deleting user id : ${id} ! Does not exist !`,
-          });
+        response.status(404).json({
+          message: `Error deleting user id : ${id} ! Does not exist !`,
+        });
       }
     })
     .catch((error) => {
@@ -96,13 +90,39 @@ app.delete("/api/persons/:id", (request, response, next) => {
 });
 
 // ADD an entry
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   const body = request.body;
   const newPerson = new Phonebook({
     name: body.name,
     number: body.number,
   });
-  newPerson.save().then((savedPerson) => response.json(savedPerson));
+  newPerson
+    .save()
+    .then((savedPerson) => response.json(savedPerson))
+    .catch((error) => {
+      console.log(error);
+      next(error);
+    });
+});
+
+// Update an entry
+app.put("/api/persons/:id", (request, response, next) => {
+  const id = request.params.id;
+  const updatedPerson = {
+    name: request.body.name,
+    number: request.body.number,
+  };
+  Phonebook.findByIdAndUpdate(id, updatedPerson, { new: true })
+    .then((updatedDoc) => {
+      // console.log(`Document to update >> ${updatedDoc}`);
+      response
+        .status(200)
+        .json({ message: `Updated details of ${updatedDoc.name} successfully !` });
+    })
+    .catch((error) => {
+      console.log(`Caught error >>> ${error}`);
+      next(error);
+    });
 });
 
 // use error handling middleware
