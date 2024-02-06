@@ -31,6 +31,10 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === "CastError") {
     response.status(400).json({ message: error.message });
   }
+  if(error.name === "ValidationError") {
+    console.log(`Validation Error handling : ${error.message}`)
+    response.status(400).json({error : error.message})
+  }
   next();
 };
 
@@ -62,7 +66,7 @@ app.get("/api/info", (request, response) => {
 app.get("/api/persons/:id", (request, response, next) => {
   const id = request.params.id;
   Phonebook.findById(id)
-    .then(doc => response.status(200).json(doc))
+    .then((doc) => response.status(200).json(doc))
     .catch((error) => {
       console.log(error);
       next(error);
@@ -100,7 +104,7 @@ app.post("/api/persons", (request, response, next) => {
     .save()
     .then((savedPerson) => response.json(savedPerson))
     .catch((error) => {
-      console.log(error);
+      // console.log(`Error caught backend >>> ${error}`);
       next(error);
     });
 });
@@ -112,18 +116,27 @@ app.put("/api/persons/:id", (request, response, next) => {
     name: request.body.name,
     number: request.body.number,
   };
-  Phonebook.findByIdAndUpdate(id, updatedPerson, { new: true })
+  Phonebook.findByIdAndUpdate(id, updatedPerson, { new: true , runValidators: true, context: "query"})
     .then((updatedDoc) => {
       // console.log(`Document to update >> ${updatedDoc}`);
       response
         .status(200)
-        .json({ message: `Updated details of ${updatedDoc.name} successfully !` });
+        .json({
+          message: `Updated details of ${updatedDoc.name} successfully !`,
+        });
     })
     .catch((error) => {
-      console.log(`Caught error >>> ${error}`);
+      console.log(`Backend Caught error updating entry >>> ${error}`);
       next(error);
     });
 });
+
+// handle non existent routes
+const unknownEndpoint = (request, response) => {
+  response.status(404).json({ message: "Not found on server !" });
+};
+
+app.use(unknownEndpoint);
 
 // use error handling middleware
 app.use(errorHandler);
