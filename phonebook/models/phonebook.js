@@ -1,13 +1,13 @@
-require("dotenv").config();
-const mongoose = require("mongoose");
+require('dotenv').config();
+const mongoose = require('mongoose');
 
 const url = process.env.MONGO_URI;
 
-mongoose.set("strictQuery", false);
+mongoose.set('strictQuery', false);
 
 mongoose
   .connect(url)
-  .then(() => console.log(`Connected to DB.....`))
+  .then(() => console.log('Connected to DB.....'))
   .catch((error) => console.log(`Error connecting to DB.....${error}`));
 
 // Phonebook schema
@@ -20,18 +20,18 @@ const phoneSchema = new mongoose.Schema({
     type: String,
     minLength: 8,
     validate: {
-        validator: function(num) {
-            return /(^\d{2,3})\-(\d+$)/.test(num)
-        },
-        message : function(props) {
-            return `Invalid phone number : ${props.value} !!`
-        }
+      validator: function(num) {
+        return /(^\d{2,3})-(\d+$)/.test(num);
+      },
+      message : function(props) {
+        return `Invalid phone number : ${props.value} !!`;
+      }
     },
-    required: [true, "Phone number is required !"]
+    required: [true, 'Phone number is required !']
   },
 });
 
-phoneSchema.set("toJSON", {
+phoneSchema.set('toJSON', {
   transform: (document, returnedObj) => {
     returnedObj.id = String(returnedObj._id);
     delete returnedObj._id;
@@ -39,4 +39,4 @@ phoneSchema.set("toJSON", {
   },
 });
 
-module.exports = mongoose.model("Phone", phoneSchema);
+module.exports = mongoose.model('Phone', phoneSchema);

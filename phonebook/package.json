@@ -8,6 +8,8 @@
     "build:ui": "@powershell Remove-Item -Recurse -Force dist && cd ../../fullstackopen_univ_helsinki/part2/phonebook && npm run build && @powershell Copy-Item dist -Recurse ../../../fullstackopen_univ_helsinki_Part3/phonebook",
     "deploy:full": "npm run build:ui && git add . && git commit -m \"phonebook deploy on Render\" && git push origin master",
     "dev": "nodemon index.js",
+    "lint" : "eslint .",
+    "lint-fix": "eslint . --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -25,6 +27,7 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "eslint": "^8.56.0",
     "nodemon": "^3.0.2"
   }
 }
